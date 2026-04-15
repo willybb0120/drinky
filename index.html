@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Drinky" />
+  <meta name="theme-color" content="#2196f3" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/style.css" />
+  <title>Drinky - 喝水紀錄</title>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div>
+        <h1>Drinky</h1>
+        <p class="date" id="today-date"></p>
+      </div>
+      <button type="button" class="icon-btn" id="calendar-btn" aria-label="月曆">📅</button>
+    </header>
+
+    <section class="progress-section">
+      <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="ring-bg" cx="100" cy="100" r="85" />
+        <circle class="ring-fg" id="ring-fg" cx="100" cy="100" r="85"
+          stroke-dasharray="534" stroke-dashoffset="534" transform="rotate(-90 100 100)" />
+      </svg>
+      <div class="progress-text">
+        <div class="amount"><span id="current-ml">0</span><span class="unit">ml</span></div>
+        <div class="goal">/ <span id="goal-ml">2000</span> ml</div>
+        <div class="percent" id="percent">0%</div>
+      </div>
+    </section>
+
+    <section class="quick-add">
+      <div class="quick-add-grid" id="container-grid"></div>
+      <button class="manual-btn" id="manual-btn">+ 手動輸入</button>
+    </section>
+
+    <section class="records">
+      <h2>今日紀錄</h2>
+      <ul class="record-list" id="record-list"></ul>
+      <p class="empty-hint" id="empty-hint">還沒有紀錄，開始喝水吧 💧</p>
+    </section>
+  </main>
+
+  <div class="modal" id="settings-modal" hidden>
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2>容器管理</h2>
+        <button type="button" class="icon-btn" id="close-settings" aria-label="關閉">✕</button>
+      </header>
+
+      <div class="goal-row">
+        <label for="goal-input">每日目標 (ml)</label>
+        <input type="number" id="goal-input" min="100" max="10000" step="100" />
+      </div>
+
+      <p class="warn" id="container-warn" hidden>建議控制在 6 個以內以維持選擇效率</p>
+
+      <ul class="container-list" id="container-list"></ul>
+
+      <form class="container-form" id="container-form">
+        <h3 id="form-title">新增容器</h3>
+        <input type="hidden" id="edit-id" />
+        <div class="form-row">
+          <label>圖示</label>
+          <input type="text" id="input-icon" maxlength="2" placeholder="☕" required />
+        </div>
+        <div class="form-row">
+          <label>名稱</label>
+          <input type="text" id="input-name" maxlength="20" minlength="1" placeholder="馬克杯" required />
+        </div>
+        <div class="form-row">
+          <label>容量 (ml)</label>
+          <input type="number" id="input-volume" min="1" max="5000" placeholder="250" required />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" id="cancel-edit" hidden>取消</button>
+          <button type="submit" class="btn-primary" id="submit-btn">新增</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="manual-modal" hidden>
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2>手動輸入</h2>
+        <button type="button" class="icon-btn" id="close-manual" aria-label="關閉">✕</button>
+      </header>
+      <form id="manual-form">
+        <div class="form-row">
+          <label>容量 (ml)</label>
+          <input type="number" id="manual-ml" min="1" max="5000" required />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">新增紀錄</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="calendar-modal" hidden>
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2>喝水月曆</h2>
+        <button type="button" class="icon-btn" id="close-calendar" aria-label="關閉">✕</button>
+      </header>
+      <div class="cal-nav">
+        <button type="button" class="icon-btn" id="cal-prev">‹</button>
+        <span id="cal-month-label"></span>
+        <button type="button" class="icon-btn" id="cal-next">›</button>
+      </div>
+      <div class="cal-weekdays">
+        <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-legend">
+        <span class="cal-dot cal-dot--met"></span>達標
+        <span class="cal-dot cal-dot--partial"></span>未達標
+        <span class="cal-dot cal-dot--none"></span>無紀錄
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="edit-container-modal" hidden>
+    <div class="modal-content modal-content--compact">
+      <header class="modal-header">
+        <h2>編輯容器</h2>
+        <button type="button" class="icon-btn" id="close-edit-container" aria-label="關閉">✕</button>
+      </header>
+      <form id="edit-container-form">
+        <input type="hidden" id="edit-container-id" />
+        <div class="form-row">
+          <label>圖示</label>
+          <input type="text" id="edit-container-icon" maxlength="2" placeholder="☕" />
+        </div>
+        <div class="form-row">
+          <label>名稱</label>
+          <input type="text" id="edit-container-name" maxlength="20" required />
+        </div>
+        <div class="form-row">
+          <label>容量 (ml)</label>
+          <input type="number" id="edit-container-volume" min="1" max="5000" required />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-danger" id="delete-container-btn">刪除容器</button>
+          <button type="submit" class="btn-primary">儲存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
