@@ -375,5 +375,12 @@
         console.warn('SW register failed:', err);
       });
     });
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
   }
 })();
