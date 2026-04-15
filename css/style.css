@@ -89,7 +89,14 @@ body {
   width: 240px;
   height: 240px;
   margin: 20px auto 28px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
+
+.progress-section:active {
+  opacity: 0.8;
+}
+
 
 .ring {
   width: 100%;

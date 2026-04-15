@@ -18,13 +18,13 @@
   <main class="app">
     <header class="header">
       <div>
-        <h1>Drinky <span class="version">v0.0.1</span></h1>
+        <h1>Drinky <span class="version">v0.0.2</span></h1>
         <p class="date" id="today-date"></p>
       </div>
       <button type="button" class="icon-btn" id="calendar-btn" aria-label="月曆">📅</button>
     </header>
 
-    <section class="progress-section">
+    <section class="progress-section" id="progress-section" role="button" tabindex="0" aria-label="點此設定每日目標">
       <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
         <circle class="ring-bg" cx="100" cy="100" r="85" />
         <circle class="ring-fg" id="ring-fg" cx="100" cy="100" r="85"
@@ -50,41 +50,16 @@
   </main>
 
   <div class="modal" id="settings-modal" hidden>
-    <div class="modal-content">
+    <div class="modal-content modal-content--compact">
       <header class="modal-header">
-        <h2>容器管理</h2>
+        <h2>每日目標</h2>
         <button type="button" class="icon-btn" id="close-settings" aria-label="關閉">✕</button>
       </header>
 
       <div class="goal-row">
-        <label for="goal-input">每日目標 (ml)</label>
+        <label for="goal-input">目標飲水量 (ml)</label>
         <input type="number" id="goal-input" min="100" max="10000" step="100" />
       </div>
-
-      <p class="warn" id="container-warn" hidden>建議控制在 6 個以內以維持選擇效率</p>
-
-      <ul class="container-list" id="container-list"></ul>
-
-      <form class="container-form" id="container-form">
-        <h3 id="form-title">新增容器</h3>
-        <input type="hidden" id="edit-id" />
-        <div class="form-row">
-          <label>圖示</label>
-          <input type="text" id="input-icon" maxlength="2" placeholder="☕" required />
-        </div>
-        <div class="form-row">
-          <label>名稱</label>
-          <input type="text" id="input-name" maxlength="20" minlength="1" placeholder="馬克杯" required />
-        </div>
-        <div class="form-row">
-          <label>容量 (ml)</label>
-          <input type="number" id="input-volume" min="1" max="5000" placeholder="250" required />
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" id="cancel-edit" hidden>取消</button>
-          <button type="submit" class="btn-primary" id="submit-btn">新增</button>
-        </div>
-      </form>
     </div>
   </div>
 

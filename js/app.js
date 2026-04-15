@@ -13,6 +13,7 @@
     manualBtn: document.getElementById('manual-btn'),
     recordList: document.getElementById('record-list'),
     emptyHint: document.getElementById('empty-hint'),
+    progressSection: document.getElementById('progress-section'),
     calendarBtn: document.getElementById('calendar-btn'),
     calendarModal: document.getElementById('calendar-modal'),
     closeCalendar: document.getElementById('close-calendar'),
@@ -23,16 +24,6 @@
     settingsModal: document.getElementById('settings-modal'),
     closeSettings: document.getElementById('close-settings'),
     goalInput: document.getElementById('goal-input'),
-    containerWarn: document.getElementById('container-warn'),
-    containerList: document.getElementById('container-list'),
-    containerForm: document.getElementById('container-form'),
-    formTitle: document.getElementById('form-title'),
-    editId: document.getElementById('edit-id'),
-    inputIcon: document.getElementById('input-icon'),
-    inputName: document.getElementById('input-name'),
-    inputVolume: document.getElementById('input-volume'),
-    submitBtn: document.getElementById('submit-btn'),
-    cancelEdit: document.getElementById('cancel-edit'),
     manualModal: document.getElementById('manual-modal'),
     closeManual: document.getElementById('close-manual'),
     manualForm: document.getElementById('manual-form'),
@@ -143,59 +134,6 @@
     });
   }
 
-  function renderContainerList() {
-    const containers = Storage.getContainers();
-    el.containerList.innerHTML = '';
-    el.containerWarn.hidden = containers.length <= 6;
-    containers.forEach(c => {
-      const li = document.createElement('li');
-      li.className = 'container-row';
-      const canDelete = containers.length > 1;
-      li.innerHTML = `
-        <span class="icon">${escapeHtml(c.icon)}</span>
-        <div class="info">
-          <div class="name">${escapeHtml(c.name)}</div>
-          <div class="volume">${c.volumeMl} ml</div>
-        </div>
-        <div class="row-actions">
-          <button class="edit-btn" data-id="${c.id}" aria-label="編輯">✏️</button>
-          <button class="del-btn" data-id="${c.id}" aria-label="刪除" ${canDelete ? '' : 'disabled'}>🗑</button>
-        </div>
-      `;
-      li.querySelector('.edit-btn').addEventListener('click', () => startEdit(c));
-      const delBtn = li.querySelector('.del-btn');
-      delBtn.addEventListener('click', () => {
-        if (!canDelete) return;
-        if (confirm(`刪除容器「${c.name}」？\n歷史紀錄會保留當下的名稱。`)) {
-          Storage.softDeleteContainer(c.id);
-          renderContainerList();
-          renderContainerGrid();
-        }
-      });
-      el.containerList.appendChild(li);
-    });
-  }
-
-  function startEdit(c) {
-    el.formTitle.textContent = '編輯容器';
-    el.editId.value = c.id;
-    el.inputIcon.value = c.icon;
-    el.inputName.value = c.name;
-    el.inputVolume.value = c.volumeMl;
-    el.submitBtn.textContent = '儲存';
-    el.cancelEdit.hidden = false;
-  }
-
-  function resetForm() {
-    el.formTitle.textContent = '新增容器';
-    el.editId.value = '';
-    el.inputIcon.value = '';
-    el.inputName.value = '';
-    el.inputVolume.value = '';
-    el.submitBtn.textContent = '新增';
-    el.cancelEdit.hidden = true;
-  }
-
   function escapeHtml(s) {
     const div = document.createElement('div');
     div.textContent = String(s);
@@ -270,6 +208,17 @@
     if (calMonth > 11) { calMonth = 0; calYear++; }
     renderCalendar();
   });
+  // Progress ring → open settings
+  function openSettings() {
+    el.goalInput.value = Storage.getGoal();
+    openModal(el.settingsModal);
+  }
+
+  el.progressSection.addEventListener('click', openSettings);
+  el.progressSection.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSettings(); }
+  });
+
   // Settings modal
   el.closeSettings.addEventListener('click', () => {
     closeModal(el.settingsModal);
@@ -287,27 +236,6 @@
     el.goalInput.value = Storage.getGoal();
     renderRing();
   });
-
-  el.containerForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const icon = el.inputIcon.value.trim() || '💧';
-    const name = el.inputName.value.trim();
-    const volumeMl = Number(el.inputVolume.value);
-    if (!name || !volumeMl) return;
-    const id = el.editId.value;
-    if (id) {
-      Storage.updateContainer(id, { icon, name, volumeMl });
-      toast('容器已更新');
-    } else {
-      Storage.addContainer({ icon, name, volumeMl });
-      toast('容器已新增');
-    }
-    resetForm();
-    renderContainerList();
-    renderContainerGrid();
-  });
-
-  el.cancelEdit.addEventListener('click', resetForm);
 
   // Edit container modal
   el.deleteContainerBtn.addEventListener('click', () => {
