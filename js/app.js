@@ -28,6 +28,12 @@
     closeManual: document.getElementById('close-manual'),
     manualForm: document.getElementById('manual-form'),
     manualMl: document.getElementById('manual-ml'),
+    dayDetailModal: document.getElementById('day-detail-modal'),
+    closeDayDetail: document.getElementById('close-day-detail'),
+    dayDetailTitle: document.getElementById('day-detail-title'),
+    dayDetailSummary: document.getElementById('day-detail-summary'),
+    dayDetailList: document.getElementById('day-detail-list'),
+    dayDetailEmpty: document.getElementById('day-detail-empty'),
     editContainerModal: document.getElementById('edit-container-modal'),
     closeEditContainer: document.getElementById('close-edit-container'),
     editContainerForm: document.getElementById('edit-container-form'),
@@ -51,6 +57,13 @@
     const d = new Date();
     const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
     return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} (${weekdays[d.getDay()]})`;
+  }
+
+  function formatDateFromKey(key) {
+    const [y, m, d] = key.split('-').map(Number);
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    const dow = new Date(y, m - 1, d).getDay();
+    return `${y}年${m}月${d}日 (週${weekdays[dow]})`;
   }
 
   function formatTime(ts) {
@@ -149,6 +162,40 @@
   function openModal(m) { m.hidden = false; }
   function closeModal(m) { m.hidden = true; }
 
+  function openDayDetail(key) {
+    const records = Storage.getDayRecords(key);
+    const total = records.reduce((s, r) => s + r.ml, 0);
+    const goal = Storage.getGoal();
+
+    el.dayDetailTitle.textContent = formatDateFromKey(key);
+    el.dayDetailSummary.textContent = total > 0
+      ? `共 ${total} ml（目標 ${goal} ml，${Math.round(total / goal * 100)}%）`
+      : '';
+    el.dayDetailEmpty.hidden = records.length > 0;
+    el.dayDetailList.innerHTML = '';
+    records.forEach(r => {
+      const li = document.createElement('li');
+      li.className = 'record-item';
+      const icon = r.containerIconSnapshot || '💧';
+      const name = r.containerNameSnapshot || '手動輸入';
+      li.innerHTML = `
+        <span class="record-icon">${escapeHtml(icon)}</span>
+        <div class="record-info">
+          <div class="record-name">${escapeHtml(name)}</div>
+          <div class="record-time">${formatTime(r.at)}</div>
+        </div>
+        <span class="record-ml">${r.ml} ml</span>
+      `;
+      el.dayDetailList.appendChild(li);
+    });
+    openModal(el.dayDetailModal);
+  }
+
+  el.closeDayDetail.addEventListener('click', () => closeModal(el.dayDetailModal));
+  el.dayDetailModal.addEventListener('click', (e) => {
+    if (e.target === el.dayDetailModal) closeModal(el.dayDetailModal);
+  });
+
   // Calendar
   let calYear = new Date().getFullYear();
   let calMonth = new Date().getMonth();
@@ -184,6 +231,8 @@
         ? (total >= 1000 ? (total / 1000).toFixed(1) + 'L' : total + 'ml')
         : '';
       cell.innerHTML = `<span class="cal-day-num">${d}</span>${mlText ? `<span class="cal-day-ml">${mlText}</span>` : ''}`;
+      cell.style.cursor = 'pointer';
+      cell.addEventListener('click', () => openDayDetail(key));
       el.calGrid.appendChild(cell);
     }
   }
@@ -291,6 +340,7 @@
   // Init
   el.todayDate.textContent = formatDate();
   closeModal(el.calendarModal);
+  closeModal(el.dayDetailModal);
   closeModal(el.settingsModal);
   closeModal(el.manualModal);
   closeModal(el.editContainerModal);

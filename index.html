@@ -18,7 +18,7 @@
   <main class="app">
     <header class="header">
       <div>
-        <h1>Drinky <span class="version">v0.0.2</span></h1>
+        <h1>Drinky <span class="version">v0.1.0</span></h1>
         <p class="date" id="today-date"></p>
       </div>
       <button type="button" class="icon-btn" id="calendar-btn" aria-label="月曆">📅</button>
@@ -101,6 +101,18 @@
         <span class="cal-dot cal-dot--partial"></span>未達標
         <span class="cal-dot cal-dot--none"></span>無紀錄
       </div>
+    </div>
+  </div>
+
+  <div class="modal modal--card" id="day-detail-modal" hidden>
+    <div class="modal-content modal-content--card">
+      <header class="modal-header">
+        <h2 id="day-detail-title"></h2>
+        <button type="button" class="icon-btn" id="close-day-detail" aria-label="關閉">✕</button>
+      </header>
+      <div class="day-detail-summary" id="day-detail-summary"></div>
+      <ul class="record-list" id="day-detail-list"></ul>
+      <p class="empty-hint" id="day-detail-empty">當天無紀錄</p>
     </div>
   </div>
 

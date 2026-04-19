@@ -110,6 +110,11 @@
       return day.records.slice().sort((a, b) => a.at - b.at);
     },
 
+    getDayRecords(key) {
+      const { day } = getDay(key);
+      return day.records.slice().sort((a, b) => a.at - b.at);
+    },
+
     getTodayTotal() {
       return this.getTodayRecords().reduce((sum, r) => sum + r.ml, 0);
     },
