@@ -10,7 +10,7 @@
     goalMl: document.getElementById('goal-ml'),
     percent: document.getElementById('percent'),
     containerGrid: document.getElementById('container-grid'),
-    manualBtn: document.getElementById('manual-btn'),
+    addContainerBtn: document.getElementById('add-container-btn'),
     recordList: document.getElementById('record-list'),
     emptyHint: document.getElementById('empty-hint'),
     progressSection: document.getElementById('progress-section'),
@@ -24,10 +24,12 @@
     settingsModal: document.getElementById('settings-modal'),
     closeSettings: document.getElementById('close-settings'),
     goalInput: document.getElementById('goal-input'),
-    manualModal: document.getElementById('manual-modal'),
-    closeManual: document.getElementById('close-manual'),
-    manualForm: document.getElementById('manual-form'),
-    manualMl: document.getElementById('manual-ml'),
+    addContainerModal: document.getElementById('add-container-modal'),
+    closeAddContainer: document.getElementById('close-add-container'),
+    addContainerForm: document.getElementById('add-container-form'),
+    addContainerIcon: document.getElementById('add-container-icon'),
+    addContainerName: document.getElementById('add-container-name'),
+    addContainerVolume: document.getElementById('add-container-volume'),
     dayDetailModal: document.getElementById('day-detail-modal'),
     closeDayDetail: document.getElementById('close-day-detail'),
     dayDetailTitle: document.getElementById('day-detail-title'),
@@ -317,24 +319,26 @@
     toast('容器已更新');
   });
 
-  // Manual modal
-  el.manualBtn.addEventListener('click', () => {
-    el.manualMl.value = '';
-    openModal(el.manualModal);
-    setTimeout(() => el.manualMl.focus(), 100);
+  // Add container modal
+  el.addContainerBtn.addEventListener('click', () => {
+    el.addContainerForm.reset();
+    openModal(el.addContainerModal);
+    setTimeout(() => el.addContainerIcon.focus(), 100);
   });
-  el.closeManual.addEventListener('click', () => closeModal(el.manualModal));
-  el.manualModal.addEventListener('click', (e) => {
-    if (e.target === el.manualModal) closeModal(el.manualModal);
+  el.closeAddContainer.addEventListener('click', () => closeModal(el.addContainerModal));
+  el.addContainerModal.addEventListener('click', (e) => {
+    if (e.target === el.addContainerModal) closeModal(el.addContainerModal);
   });
-  el.manualForm.addEventListener('submit', (e) => {
+  el.addContainerForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const ml = Number(el.manualMl.value);
-    if (!ml || ml < 1) return;
-    Storage.addRecord(ml, null);
-    closeModal(el.manualModal);
+    const icon = el.addContainerIcon.value.trim() || '💧';
+    const name = el.addContainerName.value.trim();
+    const volumeMl = Number(el.addContainerVolume.value);
+    if (!name || !volumeMl) return;
+    Storage.addContainer({ icon, name, volumeMl });
+    closeModal(el.addContainerModal);
     render();
-    toast(`+${ml}ml`);
+    toast(`已新增容器：${name}`);
   });
 
   // Init
@@ -342,7 +346,7 @@
   closeModal(el.calendarModal);
   closeModal(el.dayDetailModal);
   closeModal(el.settingsModal);
-  closeModal(el.manualModal);
+  closeModal(el.addContainerModal);
   closeModal(el.editContainerModal);
   render();
 
