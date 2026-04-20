@@ -269,6 +269,15 @@ body {
   box-shadow: var(--shadow);
 }
 
+.record-item--clickable {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.record-item--clickable:hover {
+  background: var(--surface-hover, #e8f4fd);
+}
+
 .record-icon {
   font-size: 22px;
 }
@@ -293,21 +302,6 @@ body {
   color: var(--primary);
   font-weight: 600;
   margin-right: 4px;
-}
-
-.del-btn {
-  background: transparent;
-  border: none;
-  color: var(--danger);
-  font-size: 18px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.del-btn:active {
-  background: #ffebee;
 }
 
 .empty-hint {
@@ -507,19 +501,19 @@ body {
   margin-top: 12px;
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary, .btn-secondary, .btn-danger {
   padding: 10px 18px;
   border-radius: 8px;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   min-height: 44px;
-  border: none;
 }
 
 .btn-primary {
   background: var(--primary);
   color: white;
+  border: none;
 }
 
 .btn-primary:active {

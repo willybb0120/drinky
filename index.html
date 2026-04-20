@@ -18,7 +18,7 @@
   <main class="app">
     <header class="header">
       <div>
-        <h1>Drinky <span class="version">v0.2.0</span></h1>
+        <h1>Drinky <span class="version">v0.3.0</span></h1>
         <p class="date" id="today-date"></p>
       </div>
       <button type="button" class="icon-btn" id="calendar-btn" aria-label="月曆">📅</button>
@@ -146,6 +146,34 @@
         </div>
         <div class="form-actions">
           <button type="button" class="btn-danger" id="delete-container-btn">刪除容器</button>
+          <button type="submit" class="btn-primary">儲存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="edit-record-modal" hidden>
+    <div class="modal-content modal-content--compact">
+      <header class="modal-header">
+        <h2>編輯紀錄</h2>
+        <button type="button" class="icon-btn" id="close-edit-record" aria-label="關閉">✕</button>
+      </header>
+      <form id="edit-record-form">
+        <input type="hidden" id="edit-record-id" />
+        <div class="form-row">
+          <label>名稱</label>
+          <input type="text" id="edit-record-name" maxlength="20" required />
+        </div>
+        <div class="form-row">
+          <label>時間</label>
+          <input type="time" id="edit-record-time" required />
+        </div>
+        <div class="form-row">
+          <label>水量 (ml)</label>
+          <input type="number" id="edit-record-ml" min="1" max="9999" required />
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-danger" id="delete-record-btn">刪除</button>
           <button type="submit" class="btn-primary">儲存</button>
         </div>
       </form>

@@ -44,6 +44,14 @@
     editContainerName: document.getElementById('edit-container-name'),
     editContainerVolume: document.getElementById('edit-container-volume'),
     deleteContainerBtn: document.getElementById('delete-container-btn'),
+    editRecordModal: document.getElementById('edit-record-modal'),
+    closeEditRecord: document.getElementById('close-edit-record'),
+    editRecordForm: document.getElementById('edit-record-form'),
+    editRecordId: document.getElementById('edit-record-id'),
+    editRecordName: document.getElementById('edit-record-name'),
+    editRecordTime: document.getElementById('edit-record-time'),
+    editRecordMl: document.getElementById('edit-record-ml'),
+    deleteRecordBtn: document.getElementById('delete-record-btn'),
     toast: document.getElementById('toast')
   };
 
@@ -127,7 +135,7 @@
     el.emptyHint.hidden = records.length > 0;
     records.forEach(r => {
       const li = document.createElement('li');
-      li.className = 'record-item';
+      li.className = 'record-item record-item--clickable';
       const icon = r.containerIconSnapshot || '💧';
       const name = r.containerNameSnapshot || '手動輸入';
       li.innerHTML = `
@@ -137,14 +145,8 @@
           <div class="record-time">${formatTime(r.at)}</div>
         </div>
         <span class="record-ml">${r.ml} ml</span>
-        <button class="del-btn" aria-label="刪除" data-id="${r.id}">🗑</button>
       `;
-      li.querySelector('.del-btn').addEventListener('click', () => {
-        if (confirm(`刪除這筆紀錄（${r.ml}ml）？`)) {
-          Storage.deleteRecord(r.id);
-          render();
-        }
-      });
+      li.addEventListener('click', () => openEditRecord(r));
       el.recordList.appendChild(li);
     });
   }
@@ -163,6 +165,17 @@
 
   function openModal(m) { m.hidden = false; }
   function closeModal(m) { m.hidden = true; }
+
+  function openEditRecord(r) {
+    const d = new Date(r.at);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    el.editRecordId.value = r.id;
+    el.editRecordName.value = r.containerNameSnapshot || '';
+    el.editRecordTime.value = `${hh}:${mm}`;
+    el.editRecordMl.value = r.ml;
+    openModal(el.editRecordModal);
+  }
 
   function openDayDetail(key) {
     const records = Storage.getDayRecords(key);
@@ -192,6 +205,38 @@
     });
     openModal(el.dayDetailModal);
   }
+
+  el.closeEditRecord.addEventListener('click', () => closeModal(el.editRecordModal));
+  el.editRecordModal.addEventListener('click', (e) => {
+    if (e.target === el.editRecordModal) closeModal(el.editRecordModal);
+  });
+
+  el.editRecordForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = el.editRecordId.value;
+    const name = el.editRecordName.value.trim();
+    const ml = Number(el.editRecordMl.value);
+    const [hh, mm] = el.editRecordTime.value.split(':').map(Number);
+    const today = new Date();
+    today.setHours(hh, mm, 0, 0);
+    if (!name || !ml) return;
+    const updated = Storage.updateRecord(id, { ml, at: today.getTime(), containerNameSnapshot: name });
+    if (!updated) { toast('更新失敗'); return; }
+    closeModal(el.editRecordModal);
+    render();
+    toast('紀錄已更新');
+  });
+
+  el.deleteRecordBtn.addEventListener('click', () => {
+    const id = el.editRecordId.value;
+    if (confirm('刪除這筆紀錄？')) {
+      const deleted = Storage.deleteRecord(id);
+      if (!deleted) { toast('刪除失敗，請重新整理'); return; }
+      closeModal(el.editRecordModal);
+      render();
+      toast('紀錄已刪除');
+    }
+  });
 
   el.closeDayDetail.addEventListener('click', () => closeModal(el.dayDetailModal));
   el.dayDetailModal.addEventListener('click', (e) => {
@@ -348,6 +393,7 @@
   closeModal(el.settingsModal);
   closeModal(el.addContainerModal);
   closeModal(el.editContainerModal);
+  closeModal(el.editRecordModal);
   render();
 
   // Service Worker

@@ -156,6 +156,22 @@
       return result;
     },
 
+    updateRecord(id, patch) {
+      const data = load();
+      const k = todayKey();
+      if (!data.days[k]) return null;
+      const r = data.days[k].records.find(x => x.id === id);
+      if (!r) return null;
+      if (patch.ml !== undefined) r.ml = Math.max(1, Math.round(Number(patch.ml)));
+      if (patch.at !== undefined) {
+        const ts = Number(patch.at);
+        if (ts > 0) r.at = Math.round(ts);
+      }
+      if (patch.containerNameSnapshot !== undefined) r.containerNameSnapshot = String(patch.containerNameSnapshot).trim().slice(0, 20);
+      save(data);
+      return r;
+    },
+
     deleteRecord(id) {
       const data = load();
       const k = todayKey();
